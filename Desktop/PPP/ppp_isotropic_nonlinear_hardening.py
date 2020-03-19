@@ -9,37 +9,37 @@ def nonlinear_fem(youngs_modulus,yield_stress,hardening_modulus,delta_y,eta):
     ================================================================================================================================================================================================
     '''
     '''***MATERIAL PARAMETER***'''
-    print('='*80)
-    print('\t\t\tFEM')
-    print('='*80)
+    # print('='*80)
+    # print('\t\t\tFEM')
+    # print('='*80)
     poission_ratio = 0.3
     #youngs_modulus = 21000 #Mpa
     #hardening_modulus = 200 #Mpa
     #delta_y = 200
     #eta = 10
-    print("poisiion_ratio",poission_ratio)
-    print("youngs_mpdulus",youngs_modulus)
-    print("yield_stress",yield_stress)
-    print("hardening_modulus",hardening_modulus)
-    print("delta_y",delta_y)
-    print("eta",eta)
+    # print("poisiion_ratio",poission_ratio)
+    # print("youngs_mpdulus",youngs_modulus)
+    # print("yield_stress",yield_stress)
+    # print("hardening_modulus",hardening_modulus)
+    # print("delta_y",delta_y)
+    # print("eta",eta)
     '''***GEOMETRICAL PARAMETER***'''
     length = 50  #mm
     radius = 0.5   #mm
-    print("length",length)
-    print("radius",radius)
+    # print("length",length)
+    # print("radius",radius)
     '''***TIME PARAMETERS***'''
     tau = 0
     time_step = 0.01
     total_time = 1
-    print("time_step",time_step)
+    # print("time_step",time_step)
 
     '''***EXTERNAL LOADING***'''
     f_ext = 75000  #Mpa
     #yield_stress = 490.25 #Mpa    mild steel
-    print("f_ext",f_ext)
-    print("yield_stress",yield_stress)
-    print('='*80)
+    #print("f_ext",f_ext)
+    #print("yield_stress",yield_stress)
+    #print('='*80)
 
     '''***lame's constant***'''
     mu = (youngs_modulus/(2*(1+poission_ratio)))
@@ -84,6 +84,10 @@ def nonlinear_fem(youngs_modulus,yield_stress,hardening_modulus,delta_y,eta):
     ================================================================================================================================================================================================
     '''
     def elements_coordinates(nelm,nelm_length,nelm_radius):
+        '''
+        
+        
+        '''
         all_ele_coord = np.zeros((nelm,4,2))
         loop = 0
         for j in range(int(np.sqrt(nelm))):
@@ -154,10 +158,12 @@ def nonlinear_fem(youngs_modulus,yield_stress,hardening_modulus,delta_y,eta):
         # # print(strain)
         #print("eq_stress",trial_stress_equivalent)
         #print("alpha",alpha_updated[i,j])
+        #np.longdouble(eta)
         beta = (hardening_modulus*alpha[i,j]) + delta_y*(1-np.exp(-(eta)*alpha[i,j]))
         #print("Beta", beta)
         phi = np.linalg.norm(trial_stress_deviatoric) - (np.sqrt(2/3)*(yield_stress + beta))
-        if phi < 0:
+        #print("phi",phi)
+        if phi <= 0:
             # print("elastic")
             #print("C",C)
             stress_equivalent[i,j] = trial_stress_equivalent
@@ -194,8 +200,8 @@ def nonlinear_fem(youngs_modulus,yield_stress,hardening_modulus,delta_y,eta):
             alpha_updated[i,j] =  (np.sqrt(((3/2) * np.dot(plastic_strain_deviatoric.T,plastic_strain_deviatoric)))).item()
             #print("Alpha", alpha_updated[i,j])
             # stress = current_stress
-            beta_1 = 1-((phi/np.linalg.norm(trial_stress_deviatoric))*(1/(1+(hardening_modulus/3*mu))))
-            beta_2 = (1-(phi/np.linalg.norm(trial_stress_deviatoric)))*(1/(1+(hardening_modulus/3*mu)))
+            beta_1 = 1-((np.divide(phi,np.linalg.norm(trial_stress_deviatoric),out=np.zeros_like(trial_stress_deviatoric),where=np.linalg.norm(trial_stress_deviatoric)!=0))*(1/(1+(hardening_modulus/3*mu))))
+            beta_2 = (1-(np.divide(phi,np.linalg.norm(trial_stress_deviatoric),out=np.zeros_like(trial_stress_deviatoric),where=np.linalg.norm(trial_stress_deviatoric)!=0)))*(1/(1+(hardening_modulus/3*mu)))
             #print("beta 1 ",beta_1)
             #print("beta 2",beta_2)
             identity = np.ones((4,4))
